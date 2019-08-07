@@ -57,7 +57,43 @@ def register_process():
         db.session.add(new_user)
         db.session.commit()
 
-    return redirect("/")
+    return redirect("/login")
+
+@app.route('/login')
+def display_login():
+    """Display login form"""
+
+    return render_template("login.html")
+
+@app.route('/check_login')
+def check_credentials():
+    """Handles submission of log in form."""
+
+    user_email = request.args.get("email")
+    user_password = request.args.get("password")
+    user_object = User.query.filter(User.email==user_email, User.password==user_password).all()
+
+    if user_object:
+        session['user_id'] = user_object[0].user_id
+        flash("You are now logged in!")
+        return redirect("/")
+    elif User.query.filter(User.email==user_email, User.password!=user_password).all():
+        flash("Incorrect password. Try again!")
+        return redirect("/login")
+    else:
+        flash("Email address is not recognized, please register.")
+        return redirect("/register")
+
+@app.route('/logout')
+def log_user_out():
+    """Logs user out"""
+
+    session['user_id'] = None
+    flash("You have been logged out.")
+
+    return redirect("/login")
+
+
 
 
 if __name__ == "__main__":

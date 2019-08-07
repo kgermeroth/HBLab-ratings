@@ -5,9 +5,18 @@
 </head>
 <body>
     Ratings
+    <form action="/logout">
+        <input type="submit" value="Logout">
+    </form>
     <hr>
 
+    <ul class="flashes">
+        {% for message in get_flashed_messages() %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+
     {% block content %} put your content here {% endblock %}
-    
+
 </body>
 </html>

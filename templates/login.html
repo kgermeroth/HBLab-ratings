@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h2>User Log In</h2>
+
+<form action="/check_login">
+    Email: <input type="text" name="email" required><br><br>
+    Password: <input type="text" name="password" required><br><br>
+    <input type="submit" id="submit">
+</form>
+
+{% endblock %}
