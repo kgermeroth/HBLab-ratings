@@ -113,6 +113,15 @@ def movie_list():
     movies.sort()    
     return render_template("movie_list.html", movies=movies)
 
+@app.route('/movies/<movie_id>')
+def display_movie_info(movie_id):
+    """Displays information about the movie"""
+
+    movie = Movie.query.filter(Movie.movie_id==movie_id).one()
+    ratings = Rating.query.filter(Rating.movie_id==movie_id).all()
+
+    return render_template("movie_info.html", movie=movie, ratings=ratings)
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
