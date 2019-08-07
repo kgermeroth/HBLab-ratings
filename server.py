@@ -94,7 +94,14 @@ def log_user_out():
     return redirect("/login")
 
 
+@app.route('/users/<user_id>')
+def show_user_information(user_id):
+    """Displays all user data"""
 
+    user = User.query.filter(User.user_id==user_id).one()
+    ratings = Rating.query.filter(Rating.user_id==user_id).all()
+
+    return render_template("user_info.html", user=user,ratings=ratings)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
