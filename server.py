@@ -72,11 +72,13 @@ def check_credentials():
     user_email = request.args.get("email")
     user_password = request.args.get("password")
     user_object = User.query.filter(User.email==user_email, User.password==user_password).all()
+    user_id = user_object[0].user_id
 
     if user_object:
-        session['user_id'] = user_object[0].user_id
+        session['user_id'] = user_id
         flash("You are now logged in!")
-        return redirect("/")
+        return redirect("/users/"+str(user_id))
+
     elif User.query.filter(User.email==user_email, User.password!=user_password).all():
         flash("Incorrect password. Try again!")
         return redirect("/login")
@@ -102,6 +104,14 @@ def show_user_information(user_id):
     ratings = Rating.query.filter(Rating.user_id==user_id).all()
 
     return render_template("user_info.html", user=user,ratings=ratings)
+
+@app.route('/movies')
+def movie_list():
+    """Show list of movies."""
+
+    movies = db.session.query(Movie.title, Movie.movie_id).all()
+    movies.sort()    
+    return render_template("movie_list.html", movies=movies)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
