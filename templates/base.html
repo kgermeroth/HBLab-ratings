@@ -7,6 +7,9 @@
     Ratings
     <a href="/movies">All Movies</a>
     <a href="/users">All Users</a>
+    {% if session.get('user_id') %}
+        <a id="user_page" href="/users/{{ session.user_id }}">My Page</a>
+    {% endif %}
     <a href="/login">Login</a>
     <form action="/logout">
         <input type="submit" value="Logout">

@@ -48,7 +48,7 @@
 
         $.post('/movies/{{ movie.movie_id }}', user_rating, (response) => { alert(response.alert); 
             if (response.rating_type === 'new') {
-                $('.rating-listing').append(('<td>' + response.user_id + '</td><td>' + response.score + '</td>'));
+                $('.rating-listing').append((`<td>${response.user_id}</td><td>${response.score}</td>`));
             }
             else if (response.rating_type === 'modification') {
                 location.reload();
