@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import (Flask, render_template, redirect, request, flash, session)
+from flask import (Flask, render_template, redirect, request, flash, session, jsonify)
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Rating, Movie, connect_to_db, db
@@ -129,25 +129,48 @@ def handleUserRating(movie_id):
     user_rating = request.form.get("rating")
     current_user_id = session['user_id']
 
+    # if the user isn't logged in, return a message saying they need to login
     if current_user_id is None:
-        flash("Only logged in users may rate a movie.")
+        rating_response = {
+            "rating_type" : "invalid",
+            "alert" : "You must be logged in to add a rating!"
+            }
 
+    # otherwise see if the rating is new or a modification
     else:
+        # check to see if rating is in the system for this user+movie
+        # if it is, update the rating score and commit
         try:
             rating = Rating.query.filter(Rating.user_id==current_user_id, 
                                         Rating.movie_id==movie_id).one()
             rating.score = user_rating
             db.session.commit()
-            flash("Your rating has been updated!")
+            
+            rating_response = {
+                "rating_type" : "modification",
+                "alert" : "Your rating has been modified!",
+                "user_id" : current_user_id,
+                "score" : user_rating
+            }
+
+        # if error (means user+movie is NOT in database) then add it!
         except:
             new_rating = Rating(movie_id=movie_id, 
                                 user_id=current_user_id, 
                                 score=user_rating)
             db.session.add(new_rating)
             db.session.commit()
-            flash("Your rating has been added!")
 
-    return redirect('/movies')
+            rating_response = {
+                "rating_type" : "new",
+                "alert" : "Your rating has been added!",
+                "user_id" : current_user_id,
+                "score" : user_rating
+            }
+
+    return jsonify(rating_response)
+
+    # return redirect('/movies')
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

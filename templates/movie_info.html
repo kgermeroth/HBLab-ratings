@@ -20,7 +20,7 @@
 </form>
 <br><br><br>
 
-<table>
+<table class="rating-listing">
     <tr>
         <th>User ID</th>
         <th>Score</th>
@@ -35,17 +35,26 @@
 
 </table>
 
-<!-- <script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/jquery.js"></script>
 <script>
 
     $('#confirm-rating').on('click', handleRating);
 
-    function handleRating() {
-        const user_rating = $(".rating_choice:checked").val();
-        console.log(user_rating);
-        
+    function handleRating(evt) {
+        evt.preventDefault();
+        const user_rating = {
+            'rating': $(".rating_choice:checked").val()
+        };
 
+        $.post('/movies/{{ movie.movie_id }}', user_rating, (response) => { alert(response.alert); 
+            if (response.rating_type === 'new') {
+                $('.rating-listing').append(('<td>' + response.user_id + '</td><td>' + response.score + '</td>'));
+            }
+            else if (response.rating_type === 'modification') {
+                location.reload();
+            }
+        });
     }
 </script>
- -->
+
 {% endblock %}
