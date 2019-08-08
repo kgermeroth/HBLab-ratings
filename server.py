@@ -113,6 +113,7 @@ def movie_list():
     movies.sort()    
     return render_template("movie_list.html", movies=movies)
 
+
 @app.route('/movies/<movie_id>')
 def display_movie_info(movie_id):
     """Displays information about the movie"""
@@ -121,6 +122,32 @@ def display_movie_info(movie_id):
     ratings = Rating.query.filter(Rating.movie_id==movie_id).all()
 
     return render_template("movie_info.html", movie=movie, ratings=ratings)
+
+@app.route('/movies/<movie_id>', methods=["POST"])
+def handleUserRating(movie_id):
+    """Takes user rating and checks/adds it to database"""
+    user_rating = request.form.get("rating")
+    current_user_id = session['user_id']
+
+    if current_user_id is None:
+        flash("Only logged in users may rate a movie.")
+
+    else:
+        try:
+            rating = Rating.query.filter(Rating.user_id==current_user_id, 
+                                        Rating.movie_id==movie_id).one()
+            rating.score = user_rating
+            db.session.commit()
+            flash("Your rating has been updated!")
+        except:
+            new_rating = Rating(movie_id=movie_id, 
+                                user_id=current_user_id, 
+                                score=user_rating)
+            db.session.add(new_rating)
+            db.session.commit()
+            flash("Your rating has been added!")
+
+    return redirect('/movies')
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
